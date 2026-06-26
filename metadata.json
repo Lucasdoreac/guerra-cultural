@@ -1,0 +1,6 @@
+{
+  "name": "Bússola Comunitária",
+  "description": "Um mapa de compasso político interativo e simplificado feito para guiar pessoas sem letramento político através das pautas históricas e guerras culturais modernas usando IA e recursos de áudio e acessibilidade.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
