@@ -74,12 +74,18 @@ export default function QuestionCard({
           context: question.subtext
         })
       });
+      if (!response.ok) throw new Error("Erro na rede ou ambiente estático");
       const data = await response.json();
       if (data.explanation) {
         setAiExplanation(data);
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Utilizando explicação offline/estática local por conta de hospedagem estática:", err);
+      // Perfect static fallback for maximum user accessibility
+      setAiExplanation({
+        explanation: `Este assunto debate: "${question.text}".\n\nDe forma simplificada: \n- Um lado prioriza a liberdade individual absoluta, ou seja, que cada pessoa tome decisões próprias sem o governo dar palpites.\n- O outro lado foca no bem coletivo ou na preservação de valores tradicionais de segurança e ordem pública.`,
+        analogy: "É como decidir se um grupo de amigos deve ter um líder único para organizar a viagem ou se cada um escolhe livremente onde quer ir e comer."
+      });
     } finally {
       setIsLoadingAi(false);
     }

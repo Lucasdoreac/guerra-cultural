@@ -25,12 +25,40 @@ export default function HeadlineAnalyzer({ onApplyShift }: HeadlineAnalyzerProps
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ headline })
       });
+      if (!response.ok) throw new Error("Erro no servidor ou deploy estático");
       const data = await response.json();
       if (data.analysis) {
         setAnalysis(data);
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Utilizando analisador de pautas offline/estático por conta do deploy:", err);
+      // Determine shifts based on typical keywords
+      const lower = headline.toLowerCase();
+      let leftRight = 0.1; // slight right default
+      let authLib = -0.1; // slight lib default
+
+      if (lower.includes("tax") || lower.includes("imposto") || lower.includes("passe livre") || lower.includes("públic")) {
+        leftRight = -0.4; // left bias for public regulation/tax
+      }
+      if (lower.includes("regula") || lower.includes("militar") || lower.includes("proibir") || lower.includes("lei")) {
+        authLib = 0.5; // auth bias for rules/force
+      }
+
+      setAnalysis({
+        analysis: `Análise Local: A pauta "${headline}" mexe muito com as emoções da internet! Esse tema envolve uma escolha entre o controle/suporte do Estado (regras coletivas) versus a liberdade individual e do mercado (cada um cuida do seu).`,
+        leftRightShift: leftRight,
+        authLibShift: authLib,
+        sides: [
+          {
+            name: "Lado Pro-Regras / Social",
+            point: "Argumenta que o governo ou a comunidade organizada devem regular para garantir que todos tenham oportunidades justas e segurança."
+          },
+          {
+            name: "Lado Pro-Liberdade / Individual",
+            point: "Argumenta que cada cidadão ou comerciante deve ter o direito de escolher o que fazer com seu dinheiro ou opinião sem interferência de regras rígidas."
+          }
+        ]
+      });
     } finally {
       setIsLoading(false);
     }

@@ -46,6 +46,7 @@ export default function CounselorChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: chatHistory })
       });
+      if (!response.ok) throw new Error("Erro de rede / deploy estático");
       const data = await response.json();
 
       if (data.reply) {
@@ -60,13 +61,31 @@ export default function CounselorChat() {
         ]);
       }
     } catch (err) {
-      console.error(err);
+      console.warn("Utilizando chat com conselheiro simulado estaticamente por conta de deploy no Pages:", err);
+      // Generate standard friendly, accessible answers based on common questions
+      const lower = input.toLowerCase();
+      let reply = "Essa é uma pergunta muito importante! Em termos simples: as sociedades humanas sempre buscam o equilíbrio entre a liberdade do indivíduo e a organização do grupo. O que mais você gostaria de entender sobre o tema?";
+
+      if (lower.includes("esquerda")) {
+        reply = "A **Esquerda**, em termos bem simples do dia a dia, defende que a comunidade ou o governo deve ser como um grande guardião que divide a comida, a saúde e a escola de forma igualitária para que ninguém passe fome ou necessidade, cobrando impostos de quem tem mais para ajudar quem tem menos.";
+      } else if (lower.includes("direita")) {
+        reply = "A **Direita**, em termos bem simples, acredita que o melhor caminho para as pessoas prosperarem é a liberdade de trabalho e comércio. Ou seja, cada pessoa trabalha, cuida do seu dinheiro e colhe o fruto do seu esforço livremente, com o governo cobrando o mínimo possível de impostos.";
+      } else if (lower.includes("conservador")) {
+        reply = "Ser **Conservador** significa valorizar as tradições, a religião e a estrutura familiar herdada de nossos pais e avós. A ideia central é que o que funcionou por gerações deve ser protegido para manter a ordem e evitar que a sociedade se perca.";
+      } else if (lower.includes("liberal") || lower.includes("libertário")) {
+        reply = "Ser **Liberal** ou **Libertário** é defender que a liberdade é o bem mais precioso de todos. Significa que você deve ser livre para mandar no seu corpo, fazer suas escolhas de vida e gastar o seu próprio dinheiro sem ninguém de fora (como o governo ou uma igreja) lhe dizer o que fazer.";
+      } else if (lower.includes("autoritário") || lower.includes("estado") || lower.includes("regras")) {
+        reply = "O pensamento **Autoritário** (ou focado em regras fortes) defende que o grupo precisa de uma liderança firme e regras estritas para garantir que tudo funcione em ordem e com segurança. Sem regras firmes, algumas pessoas acham que a sociedade viraria uma bagunça.";
+      } else if (lower.includes("imposto")) {
+        reply = "Os **Impostos** são como aquela 'vaquinha' ou 'contribuição mensal' que os vizinhos fazem para manter a rua limpa e arrumada. Algumas pessoas acham que a vaquinha deve ser grande para pagar por tudo (como saúde e ônibus de graça); outras acham que deve ser pequenininha para cada um ficar com o seu próprio dinheiro e escolher onde quer gastar.";
+      }
+
       setMessages((prev) => [
         ...prev,
         {
           id: Math.random().toString(),
           role: "assistant",
-          content: "Oops! Tive um probleminha para me conectar à inteligência artificial. Mas em termos bem simples: todos os lados buscam o bem da comunidade, cada um com sua própria receita de sucesso!",
+          content: reply,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
